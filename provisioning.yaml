@@ -1,0 +1,19 @@
+---
+- name: New debian system provisioning
+  hosts: all
+
+  tasks:
+  - name: Update
+    become: true
+    ansible.builtin.apt:
+      update_cache: yes
+
+  - name: Install common use packages
+    become: true
+    ansible.builtin.apt:
+      name:
+      - curl
+      - vim
+      - git
+      - net-tools
+      state: present
