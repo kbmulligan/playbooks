@@ -1,5 +1,6 @@
 ---
 - name: New debian system provisioning
+  hosts: localhost
 
   tasks:
   - name: Update
