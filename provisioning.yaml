@@ -14,7 +14,7 @@
       name:
       - curl
       - vim
-      - git
+      - gpg
       - net-tools
       - neofetch
       state: present
