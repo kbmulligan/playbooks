@@ -16,4 +16,5 @@
       - vim
       - git
       - net-tools
+      - neofetch
       state: present
