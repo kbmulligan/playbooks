@@ -1,0 +1,34 @@
+---
+- name: Install k8s
+  hosts: control-plane, nodes, new-nodes
+  become: true
+
+  tasks:
+  - name: Update
+    become: true
+    ansible.builtin.apt:
+      update_cache: yes
+
+  - name: Install requirements
+    become: true
+    ansible.builtin.apt:
+      name:
+      - sudo
+      - curl
+      - gnupg2
+      - software-properties-common
+      - apt-transport-https
+      - ca-certificates
+      state: present
+
+  - name: Turn off swap (immediate)
+    shell: swapoff -a
+
+  - name: Turn off swap (persistent)
+    ansible.builtin.lineinfile:
+      path: /etc/fstab
+      regexp: swap
+      insertbefore: "swap"
+      line: "#"
+      state: present
+      backup: true
