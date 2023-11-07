@@ -1,0 +1,8 @@
+[control-plane]
+k8s-monastery-0 ansible_host=10.0.100.39
+
+[nodes]
+k8s-monastery-1 ansible_host=10.0.100.42
+
+[new-nodes]
+k8s-monastery-2 ansible_host=10.0.100.26
