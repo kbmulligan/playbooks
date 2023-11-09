@@ -5,12 +5,10 @@
 
   tasks:
   - name: Update
-    become: true
     ansible.builtin.apt:
       update_cache: yes
 
   - name: Install requirements
-    become: true
     ansible.builtin.apt:
       name:
       - sudo
@@ -37,7 +35,6 @@
       modprobe overlay
       modprobe br_netfilter 
 
-
   - name: Turn off swap (immediate)
     shell: swapoff -a
 
@@ -50,4 +47,21 @@
       state: present
       backup: true
 
+  - name: Install k8s repo key
+    apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present 
 
+  - name: Add k8s repo
+    apt_repository: 
+      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+      state: present
+      filename: 'kubernetes'
+
+  - name: Install kubernetes tools
+    ansible.builtin.apt:
+      name:
+      - kubelet
+      - kubectl
+      - kubeadm
+      state: present
