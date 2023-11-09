@@ -21,6 +21,23 @@
       - ca-certificates
       state: present
 
+  - name: Set hostname
+    ansible.builtin.hostname:
+      name: "{{ inventory_hostname }}"
+
+  - name: Add containerd config
+    ansible.builtin.blockinfile:
+      path: "/etc/modules-load.d/containerd.conf"
+      block: |
+        overlay
+        br_netfilter
+
+  - name: Ensure kernel plugins available for containerd
+    shell: |
+      modprobe overlay
+      modprobe br_netfilter 
+
+
   - name: Turn off swap (immediate)
     shell: swapoff -a
 
@@ -32,3 +49,5 @@
       line: "#"
       state: present
       backup: true
+
+
