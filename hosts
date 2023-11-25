@@ -2,7 +2,9 @@
 k8s-monastery-0 ansible_host=10.0.100.39
 
 [nodes]
-k8s-monastery-1 ansible_host=10.0.100.42
+monastery-1.mulli.org ansible_host=10.0.100.42
+monastery-2.mulli.org ansible_host=10.0.100.26
+monastery-4.mulli.org ansible_host=10.0.100.11
 
-[new-nodes]
-k8s-monastery-2 ansible_host=10.0.100.26
+[dns]
+dns-server-pihole    ansible_host=10.0.111.11

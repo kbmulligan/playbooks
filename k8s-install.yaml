@@ -1,7 +1,14 @@
 ---
 - name: Install k8s
-  hosts: control-plane, nodes, new-nodes
+  hosts: control-plane, nodes
   become: true
+
+  vars:
+    distro: ubuntu
+    version: jammy
+    arch: amd64
+    k8s_version: "1.28"
+    domain: "mulli.org"
 
   tasks:
   - name: Update
@@ -21,7 +28,8 @@
 
   - name: Set hostname
     ansible.builtin.hostname:
-      name: "{{ inventory_hostname }}"
+      name: "{{ inventory_hostname }}.{{ domain }}"
+
 
   - name: Add containerd config
     ansible.builtin.blockinfile:
@@ -35,26 +43,72 @@
       modprobe overlay
       modprobe br_netfilter 
 
-  - name: Turn off swap (immediate)
-    shell: swapoff -a
+  - name: Configure kernel networking parameters
+    ansible.posix.sysctl:
+      sysctl_file: /etc/sysctl.d/91-kubernetes.conf
+      name: "{{ item }}"
+      value: 1
+    loop:
+      - net.bridge.bridge-nf-call-ip6tables
+      - net.bridge.bridge-nf-call-iptables
+      - net.ipv4.ip_forward
 
-  - name: Turn off swap (persistent)
-    ansible.builtin.lineinfile:
-      path: /etc/fstab
-      regexp: swap
-      insertbefore: "swap"
-      line: "#"
-      state: present
+  - name: Turn off swap (immediate)
+    shell: swapoff --all
+
+  - name: Turn off swap (persistent via fstab)
+    ansible.posix.mount:
+      path: swap
+      state: absent
       backup: true
+
+  - name: Install containerd repo key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg 
+      state: present
+    #shell: |
+    #    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
+
+  - name: Add docker repo for containerd
+    apt_repository:
+      #repo: "deb [arch={{ arch }} signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable"
+      repo: "deb [arch={{ arch }}] https://download.docker.com/linux/ubuntu jammy stable"
+      state: present
+      filename: docker
+ 
+  - name: Install containerd
+    ansible.builtin.apt:
+      name:
+      - containerd.io 
+      state: present
+
+  - name: Configure containerd
+    block:
+      - name: Create config dir
+        ansible.builtin.file:
+          path: /etc/containerd
+          state: directory
+          mode: '0755'
+      - name: Default config
+        shell: |
+          containerd config default | tee /etc/containerd/config.toml
+          
+      - name: Restart containerd
+        ansible.builtin.systemd:
+          state: restarted
+          daemon_reload: true
+          name: containerd
 
   - name: Install k8s repo key
     apt_key:
       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      # url: https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key
       state: present 
 
   - name: Add k8s repo
     apt_repository: 
       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+      #repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/deb/ /
       state: present
       filename: 'kubernetes'
 
@@ -65,3 +119,14 @@
       - kubectl
       - kubeadm
       state: present
+
+  - name: Mark hold kubernetes tools
+    ansible.builtin.dpkg_selections:
+      name: "{{ item }}"
+      selection: hold
+    loop:
+      - kubelet 
+      - kubectl
+      - kubeadm
+       
+

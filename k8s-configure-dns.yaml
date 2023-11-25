@@ -1,0 +1,23 @@
+---
+- hosts: "dns"
+  become: true
+ 
+  tasks: 
+  - name: Set DNS entries for all nodes
+    block:
+    - name: Start
+      ansible.builtin.debug:
+        msg: "Set DNS entries here..."
+
+    - name: Add entries 
+      ansible.builtin.lineinfile:
+        path: /etc/pihole/custom.list
+        line: "{{ item }}"
+      loop: "{{ lookup('file', 'node-hostnames').splitlines() }}"
+
+    - name: Restart DNS service
+      ansible.builtin.systemd:
+        name: pihole-FTL.service
+        state: restarted
+        daemon_reload: true 
+

@@ -1,0 +1,13 @@
+---
+- hosts: "control-plane"
+  become: true
+
+  tasks:
+    - name: Initialize cluster
+      shell: |
+        kubeadm init --pod-network-cider={{ cluster_pod_net_cidr }}
+
+    - name: Get join token
+      shell: kubeadm token create --print-join-command
+      register: k8s_cluster_join_command
+
