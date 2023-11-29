@@ -8,6 +8,12 @@
         kubeadm init --pod-network-cider={{ cluster_pod_net_cidr }}
 
     - name: Get join token
-      shell: kubeadm token create --print-join-command
+      shell: kubeadm token create --print-join-command | tee /tmp/cluster-join-command.sh
       register: k8s_cluster_join_command
+
+    - name: Fetch join script
+      ansible.builtin.fetch: 
+        flat: true
+        src: /tmp/cluster-join-command.sh 
+        dest: ./
 

@@ -1,10 +1,18 @@
+[hypervisor]
+hypervisor.mulli.org ansible_host=10.0.100.200
+
+[dns]
+dns.mulli.org    ansible_host=10.0.111.11
+
 [control-plane]
-k8s-monastery-0 ansible_host=10.0.100.39
+monastery-0.mulli.org ansible_host=10.0.100.39
 
 [nodes]
 monastery-1.mulli.org ansible_host=10.0.100.42
 monastery-2.mulli.org ansible_host=10.0.100.26
-monastery-4.mulli.org ansible_host=10.0.100.11
 
-[dns]
-dns-server-pihole    ansible_host=10.0.111.11
+monastery-151.mulli.org ansible_host="10.0.100.63"
+monastery-152.mulli.org ansible_host="10.0.100.64"
+monastery-153.mulli.org ansible_host="10.0.100.65"
+monastery-154.mulli.org ansible_host="10.0.100.66"
+monastery-155.mulli.org ansible_host="10.0.100.67"

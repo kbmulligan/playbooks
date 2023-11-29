@@ -1,0 +1,31 @@
+---
+- name: Make node list
+  hosts: hypervisor
+  become: true
+
+  vars:
+    domain: mulli.org
+    vm_name: monastery
+    vmid_list:
+      - "151"
+      - "152"
+      - "153"
+      - "154"
+      - "155"
+
+  tasks:
+  - name: Create node list
+    vars:
+      net_info_file: "vm-{{ item }}-interfaces.log"
+      vm_hostname: "{{ vm_name }}-{{ item }}.{{ domain }}"
+      inventory_file: hosts
+
+    local_action: ansible.builtin.shell bash get-ip-addr.sh {{ net_info_file }} {{ vm_hostname }} >> {{ inventory_file }}
+    loop: "{{ vmid_list }}"
+           
+ 
+
+ 
+
+ 
+

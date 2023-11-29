@@ -2,6 +2,9 @@
 - name: New debian system provisioning
   hosts: localhost
 
+  vars:
+    provision_src: "10.0.0.20:4200"
+
   tasks:
   - name: Update
     become: true
@@ -18,3 +21,35 @@
       - net-tools
       - neofetch
       state: present
+
+  - name: Configure personal user
+    ansible.builtin.user:
+      name: nitor
+      append: true
+      groups: sudo,wheel
+
+  - name: Add personal authorized key
+    vars:
+      pub_key: "http://{{ provision_src }}/personal.pubkey"
+    ansible.posix.authorized_key:
+      user: nitor
+      key: "{{ lookup('ansible.builtin.url', pub_key) }}"
+
+  - name: Configure ansible user
+    ansible.builtin.user:
+      name: ansible
+      comment: "Ansible automation user"
+      uid: 1201
+      groups: sudo,wheel
+
+  - name: Add ansible authorized key
+    vars:
+      pub_key: "http://{{ provision_src }}/ansible.pubkey"
+    ansible.posix.authorized_key:
+      user: nitor
+      key: "{{ lookup('ansible.builtin.url', pubkey) }}"
+
+  - name: Report to chat channel
+    ansible.builtin.shell: |
+      webhook=$(curl http://{{ provision_src }}/webhook.url)
+      echo {\"text\":\"New system provisioned --- $(hostname) $(hostname -I)\"} | curl -X POST --data @- $webhook
