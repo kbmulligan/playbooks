@@ -26,7 +26,7 @@
     ansible.builtin.user:
       name: nitor
       append: true
-      groups: sudo,wheel
+      groups: sudo,adm
 
   - name: Add personal authorized key
     ansible.builtin.shell: |
@@ -37,7 +37,7 @@
       name: ansible
       comment: "Ansible automation user"
       uid: 1201
-      groups: sudo,wheel
+      groups: sudo,adm
 
   - name: Add ansible authorized key
     ansible.builtin.shell: |
