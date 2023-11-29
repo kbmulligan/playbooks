@@ -27,6 +27,7 @@
       name: nitor
       append: true
       groups: sudo,adm
+      shell: /bin/bash
 
   - name: Add personal authorized key
     ansible.builtin.shell: |
