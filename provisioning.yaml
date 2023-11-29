@@ -30,9 +30,7 @@
 
   - name: Add personal authorized key
     ansible.builtin.shell: |
-      touch /home/nitor/.ssh/authorized_keys
-      chown nitor:nitor /home/nitor/.ssh/authorized_keys
-      chmod 600 /home/nitor/.ssh/authorized_keys
+      install -o nitor -g nitor -m 600 -D /dev/null /home/nitor/.ssh/authorized_keys
       echo "{{ lookup('ansible.builtin.url', 'http://{{ provision_src }}/personal.pubkey') }}" >> /home/nitor/.ssh/authorized_keys
       
   - name: Configure ansible user
@@ -44,9 +42,7 @@
 
   - name: Add ansible authorized key
     ansible.builtin.shell: |
-      touch /home/ansible/.ssh/authorized_keys
-      chown ansible:ansible /home/ansible/.ssh/authorized_keys
-      chmod 600 /home/ansible/.ssh/authorized_keys
+      install -o ansible -g ansible -m 600 -D /dev/null /home/ansible/.ssh/authorized_keys
       echo "{{ lookup('ansible.builtin.url', 'http://{{ provision_src }}/ansible.pubkey') }}" >> /home/ansible/.ssh/authorized_keys
 
   - name: Report to chat channel
