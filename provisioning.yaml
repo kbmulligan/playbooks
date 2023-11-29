@@ -29,11 +29,9 @@
       groups: sudo,wheel
 
   - name: Add personal authorized key
-    vars:
-      pub_key: "http://{{ provision_src }}/personal.pubkey"
     ansible.posix.authorized_key:
       user: nitor
-      key: "{{ lookup('ansible.builtin.url', pub_key) }}"
+      key: "{{ lookup('ansible.builtin.url', 'http://{{ provision_src }}/personal.pubkey') }}"
 
   - name: Configure ansible user
     ansible.builtin.user:
@@ -43,11 +41,9 @@
       groups: sudo,wheel
 
   - name: Add ansible authorized key
-    vars:
-      pub_key: "http://{{ provision_src }}/ansible.pubkey"
     ansible.posix.authorized_key:
       user: nitor
-      key: "{{ lookup('ansible.builtin.url', pubkey) }}"
+      key: "{{ lookup('ansible.builtin.url', 'http://{{ provision_src }}/ansible.pubkey') }}"
 
   - name: Report to chat channel
     ansible.builtin.shell: |
