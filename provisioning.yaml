@@ -29,6 +29,13 @@
       groups: sudo,adm
       shell: /bin/bash
 
+  - name: Make sudo passwordless
+    ansible.builtin.lineinfile:
+      path: /etc/sudoers.d/personal-sudoers
+      line: nitor ALL=(ALL) NOPASSWD:ALL
+      create: true
+      mode: '440'
+
   - name: Add personal authorized key
     ansible.builtin.shell: |
       install -o nitor -g nitor -m 600 -D /dev/null /home/nitor/.ssh/authorized_keys
@@ -42,6 +49,13 @@
       comment: "Ansible automation user"
       uid: 1201
       groups: sudo,adm
+
+  - name: Make sudo passwordless
+    ansible.builtin.lineinfile:
+      path: /etc/sudoers.d/ansible-sudoers
+      line: ansible ALL=(ALL) NOPASSWD:ALL
+      create: true
+      mode: '440'
 
   - name: Add ansible authorized key
     ansible.builtin.shell: |
